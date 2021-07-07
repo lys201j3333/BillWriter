@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.sdu.ise.labs.dao.ProductMapper" >
+  <resultMap id="BaseResultMap" type="cn.edu.sdu.ise.labs.model.Product" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="pproduct" property="pproduct" jdbcType="VARCHAR" />
+    <result column="ptype" property="ptype" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DOUBLE" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="ctime" property="ctime" jdbcType="DATE" />
+  </resultMap>
+
+  <resultMap id="MoreResultMap" type="cn.edu.sdu.ise.labs.model.Product" >
+    <result column="y" property="y" jdbcType="DOUBLE" />
+    <result column="x" property="x" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, pproduct, ptype, price, description, ctime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from product
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from product
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.edu.sdu.ise.labs.model.Product" >
+    insert into product (id, pproduct, ptype, 
+      price, description, ctime
+      )
+    values (#{id,jdbcType=INTEGER}, #{pproduct,jdbcType=VARCHAR}, #{ptype,jdbcType=VARCHAR}, 
+      #{price,jdbcType=DOUBLE}, #{description,jdbcType=VARCHAR}, #{ctime,jdbcType=DATE}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.edu.sdu.ise.labs.model.Product" >
+    insert into product
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="pproduct != null" >
+        pproduct,
+      </if>
+      <if test="ptype != null" >
+        ptype,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="ctime != null" >
+        ctime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="pproduct != null" >
+        #{pproduct,jdbcType=VARCHAR},
+      </if>
+      <if test="ptype != null" >
+        #{ptype,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="ctime != null" >
+        #{ctime,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.edu.sdu.ise.labs.model.Product" >
+    update product
+    <set >
+      <if test="pproduct != null" >
+        pproduct = #{pproduct,jdbcType=VARCHAR},
+      </if>
+      <if test="ptype != null" >
+        ptype = #{ptype,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="ctime != null" >
+        ctime = #{ctime,jdbcType=DATE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.edu.sdu.ise.labs.model.Product" >
+    update product
+    set pproduct = #{pproduct,jdbcType=VARCHAR},
+      ptype = #{ptype,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DOUBLE},
+      description = #{description,jdbcType=VARCHAR},
+      ctime = #{ctime,jdbcType=DATE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 获取名字个数(分页) -->
+  <select id="count" resultType="integer">
+    select count(*)
+    from product
+    <where>
+      <!--      <if test="pproduct != null">-->
+      <!--        pproduct like #{pproduct}-->
+      <!--      </if>-->
+    </where>
+  </select>
+
+
+  <!-- 获取商品(分页) -->
+  <select id="list1" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from product
+    <where>
+      <if test="queryDTO.pproduct != null">
+        pproduct like #{queryDTO.pproduct}
+      </if>
+    </where>
+    limit #{offset}, #{limit}
+  </select>
+
+  <!-- 获取名字个数(分页) -->
+  <select id="count2" resultType="integer">
+    select count(*)
+    from product
+    <where>
+    </where>
+  </select>
+
+  <!-- 获取时间范围(分页) -->
+  <select id="list2" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from product
+    <where>
+      ctime between #{queryDTO.ftime} and #{queryDTO.ltime}
+    </where>
+    limit #{offset}, #{limit}
+  </select>
+
+  <!-- 获取名字个数(分页) -->
+  <select id="count3" resultType="integer">
+    select count(*)
+    from product
+    <where>
+    </where>
+  </select>
+
+  <select id="bill" resultType="integer" parameterType="cn.edu.sdu.ise.labs.dto.query.ProductQueryDTO">
+    select SUM(price)
+    from product
+    <where>
+        year(ctime) = #{syear}
+        AND
+        month(ctime) =#{smonth}
+    </where>
+  </select>
+<!--  <select id="bill" resultMap="MoreResultMap" >-->
+<!--    select month(ctime) as x ,SUM(price) as y-->
+<!--    from product-->
+<!--    <where>-->
+<!--       year(ctime) = #{syear}-->
+<!--    </where>-->
+<!--    GROUP by x-->
+<!--  </select>-->
+
+  <!--  <select id="bill" resultType="HashMap">-->
+  <!--    select-->
+  <!--    substring(ctime from 7 for 2) as mon,SUM(price)-->
+  <!--    from product-->
+  <!--    <where>-->
+  <!--      substring(ctime from 1 for 6) = #{queryDTO.syear}-->
+  <!--    </where>-->
+  <!--    limit #{offset}, #{limit}-->
+  <!--  </select>-->
+
+  <!-- 批量删除 -->
+  <update id="deleteByCodes">
+    delete from product
+    where id in
+    <foreach close=")" collection="codeList" index="index" item="item" open="(" separator=",">
+      #{item}
+    </foreach>
+  </update>
+</mapper>
